@@ -31,7 +31,7 @@ contract NftBuyOraclePriceFeed is ERC721 {
         priceFeed = AggregatorV3Interface(_priceFeed); //eth/usd sepolia chainlink price feed address
         nftPrice = 1000 * (10 ** 6); // setting the nft price
         startTime = block.timestamp; // setting start time
-        endTime = block.timestamp + 7 days; // settting end time
+        endTime = block.timestamp + 7 days; // settting end times
         fundingwallet = payable(_fundingwallet); //ssetting funding wallet
         _nftIdCounter.increment(); //counter increment
         usdtContract = IERC20(_usdtContract); // ssetting usdt ccontract
@@ -44,15 +44,15 @@ contract NftBuyOraclePriceFeed is ERC721 {
         return uint256(price); //return the eth/usd pricce
     }
 
-    //function for buying nft
+    //function for buying nft with eth
     function BuyNftWithETH(uint256 no) public payable {
         require(_nftIdCounter._value < 500); //only 500 nfts are allowed to mint
         require(
             startTime > block.timestamp || block.timestamp < endTime //1 week timee
         );
-        uint256 p = ((no * nftPrice) * (10 ** 20)) / getLatestPrice(); //calculating the usdt price
+        uint256 p = (no * nftPrice * 1e20) / getLatestPrice(); //calculating eth price
         require(msg.value > p); //user should have enough amouunt
-        fundingwallet.transfer(p); //eth transfer
+        payable(fundingwallet).transfer(p); //eth transfer
         for (uint256 i = 0; i < no; i++) {
             //for loop for user to buy nfts
 
@@ -64,7 +64,7 @@ contract NftBuyOraclePriceFeed is ERC721 {
         }
     }
 
-//function for buying nft
+    //function for buying nft with usdt
     function BuyNftWithUsdt(uint256 no) public payable {
         require(_nftIdCounter._value < 500); //only 500 nfts are allowed to mint
         require(
@@ -72,7 +72,6 @@ contract NftBuyOraclePriceFeed is ERC721 {
         );
         uint256 p = no * nftPrice; //calculating the usdt price
         require(IERC20(usdtContract).balanceOf(msg.sender) > p); //user should have enough amouunt
-        // eth transfer
         IERC20(usdtContract).transferFrom(msg.sender, fundingwallet, p); // transferrring the usdt to the funding waller
         for (uint256 i = 0; i < no; i++) {
             //for loop for user to buy nfts
@@ -93,5 +92,9 @@ contract NftBuyOraclePriceFeed is ERC721 {
     //funcction for gettig the balancce of usddt
     function getBalance(address _add) public view returns (uint256) {
         return IERC20(usdtContract).balanceOf(_add);
+    }
+
+    function getEthBalance() public view returns (uint256) {
+        return balanceOf(fundingwallet);
     }
 }

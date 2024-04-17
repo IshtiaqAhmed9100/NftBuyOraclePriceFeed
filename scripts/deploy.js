@@ -29,8 +29,8 @@ async function main() {
 //     NftBuyOraclePriceFeed.target
 //   );
 
-//   await new Promise((resolve) => setTimeout(resolve, 10000));
-  verify("0x3fc4197A3Cc2364FAa27117707398a76C494BCD9", [
+  await new Promise((resolve) => setTimeout(resolve, 10000));
+  verify("0xA9353a405acAed899B1EE7F5B0794A8E8FB51c4D", [
     priceFeed,
     fundingwallet,
     usdtContract,
